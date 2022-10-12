@@ -1,0 +1,3 @@
+# .dotfiles
+
+Nothing pretty fancy here, just my setup, so I want have to do it all again...
