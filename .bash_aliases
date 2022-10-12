@@ -1,35 +1,55 @@
-pac() {
+pakku() {
 	case $1 in
-		"")
-			sudo pacman -Syu
-			;;
+		"") pakku up;;
 		"up")
-			sudo pacman -Syu
+			echo "Update"
 			;;
 		"in")
 			shift
-			echo "Calling pacman to install $@"
-			echo ""
-			sudo pacman -S "$@"
+			if [[ $(pacman -Ss "$@") ]]; then
+				while true; do
+				    read -p "Do you want to install this package? (y/n) " yn
+				    case $yn in
+					[Yy]* ) sudo pacman -Ss "$@" --noconfirm; break;;
+					[Nn]* ) break;;
+					* ) echo "Please answer yes or no.";;
+				    esac
+				done
+			else
+			    echo "Package $@ not found"
+			fi
+			;;
+		"rm")
+			shift
+			sudo pacman -Rsn "$@"
 			;;
 		"sea")
 			shift
-			echo "Search for package $@"
-			echo ""
 			pacman -Ss "$@"
 			;;
 		"clean")
-			du -sh /var/cache/pacman/pkg/
-			sudo pacman -Scc
-			echo ""
-			echo "Orphaned packages..."
-			sudo pacman -Rns $(pacman -Qtdq)
+			while true; do
+			    du -sh /var/cache/pacman/pkg/
+			    read -p "Clean package cache? (y/n) " yn
+			    case $yn in
+				[Yy]* ) sudo pacman -Scc --noconfirm; break;;
+				[Nn]* ) break;;
+				* ) echo "Please answer yes or no.";;
+			    esac
+			done
+			while true; do
+			    read -p "Clean orphaned packages? (y/n) " yn
+			    case $yn in
+				[Yy]* ) sudo pacman -Rns $(pacman -Qtdq) --noconfirm; break;;
+				[Nn]* ) break;;
+				* ) echo "Please answer yes or no.";;
+			    esac
+			done
 			;;
 		*)
-			echo "Nothing to do . . ."
+			echo "Nothing to do..."
 			;;
 	esac
-	echo ""
 }
 
 alias s='source .bashrc'
