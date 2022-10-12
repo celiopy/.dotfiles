@@ -2,7 +2,7 @@ pakku() {
 	case $1 in
 		"") pakku up;;
 		"up")
-			echo "Update"
+			sudo pacman -Syu --noconfirm
 			;;
 		"in")
 			shift
