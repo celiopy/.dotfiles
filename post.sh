@@ -30,4 +30,21 @@ pacman -S --noconfirm cups \
     system-config-printers
 systemctl enable --now cups.service
 
+# Download pfetch
+wget https://github.com/Gobidev/pfetch-rs/releases/download/v2.9.1/pfetch-linux-gnu-x86_64.tar.gz
+
+# Extract pfetch
+tar -xzf pfetch-linux-gnu-x86_64.tar.gz
+
+# Install pfetch binary
+install -Dm755 pfetch /usr/bin/pfetch
+
+# Append line to all user's .bashrc
+for user_home in /home/*; do
+    if [ -d "$user_home" ]; then
+        echo "Appending to $user_home/.bashrc"
+        echo -e "\n\npfetch" >> "$user_home/.bashrc"
+    fi
+done
+
 echo "You still must run `hp-setup -i`"
