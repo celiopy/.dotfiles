@@ -19,15 +19,15 @@ pacman -S xdg-user-dirs
 # Hinokitsune
 pacman -S --noconfirm noto-fonts noto-fonts-emoji firefox
 
-# Plugins for XFCE
-pacman -S --noconfirm xfce4-docklike-plugin
-
-# Good conversions
-pacman -S --noconfirm imagemagick
+# Image thingy
+pacman -S --noconfirm imagemagick webp-pixbuf-loader
 
 # Printers setup
 pacman -S --noconfirm --needed cups sane python-pillow hplip system-config-printers
 systemctl enable --now cups.service
+
+# Plugins for XFCE
+pacman -S --noconfirm xfce4-docklike-plugin
 
 # Download pfetch
 wget https://github.com/Gobidev/pfetch-rs/releases/download/v2.9.1/pfetch-linux-gnu-x86_64.tar.gz
