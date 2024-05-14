@@ -13,6 +13,9 @@ echo -e "$chaotic_config" >> /etc/pacman.conf
 # Update packages
 pacman -Syu --noconfirm
 
+# XDG
+pacman -S xdg-user-dirs
+
 # Hinokitsune
 pacman -S --noconfirm noto-fonts noto-fonts-emoji firefox
 
@@ -23,11 +26,7 @@ pacman -S --noconfirm xfce4-docklike-plugin
 pacman -S --noconfirm imagemagick
 
 # Printers setup
-pacman -S --noconfirm cups \
-    sane \
-    python-pillow \
-    hplip \
-    system-config-printers
+pacman -S --noconfirm --needed cups sane python-pillow hplip system-config-printers
 systemctl enable --now cups.service
 
 # Download pfetch
@@ -47,4 +46,4 @@ for user_home in /home/*; do
     fi
 done
 
-echo "You still must run `hp-setup -i`"
+echo "You still must run hp-setup -i"
