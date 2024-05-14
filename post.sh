@@ -14,7 +14,7 @@ echo -e "$chaotic_config" >> /etc/pacman.conf
 pacman -Syu --noconfirm
 
 # XDG
-pacman -S bash-completion git xdg-user-dirs
+pacman -S bash-completion git meson xdg-user-dirs
 
 # Hinokitsune
 pacman -S --noconfirm noto-fonts noto-fonts-emoji firefox
