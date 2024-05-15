@@ -17,7 +17,7 @@ pacman -U --noconfirm 'https://cdn-mirror.chaotic.cx/chaotic-aur/chaotic-mirrorl
 
 # Append [chaotic-aur] configuration to pacman.conf
 log "Configuring pacman.conf for chaotic-aur"
-chaotic_config="[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n"
+chaotic_config="\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n"
 echo -e "$chaotic_config" >> /etc/pacman.conf
 
 # Update packages
