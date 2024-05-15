@@ -27,7 +27,7 @@ pacman -S --noconfirm --needed cups sane python-pillow hplip system-config-print
 systemctl enable --now cups.service
 
 # Plugins for XFCE
-pacman -S --noconfirm xfce4-docklike-plugin
+pacman -S --noconfirm xfce4-panel-profiles xfce4-docklike-plugin
 
 # Download pfetch
 wget https://github.com/Gobidev/pfetch-rs/releases/download/v2.9.1/pfetch-linux-gnu-x86_64.tar.gz
