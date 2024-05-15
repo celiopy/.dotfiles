@@ -38,8 +38,8 @@ pacman -S --noconfirm imagemagick webp-pixbuf-loader
 
 # Printers setup
 log "Setting up printers"
-pacman -S --noconfirm --needed cups sane python-pillow hplip system-config-printers
-systemctl enable --now cups.service
+pacman -S --noconfirm --needed sane python-pillow cups hplip system-config-printer
+systemctl enable cups.service
 
 # Plugins for XFCE
 log "Installing XFCE plugins"
