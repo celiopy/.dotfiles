@@ -8,6 +8,12 @@ log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$log_file"
 }
 
+# Make it less stupid
+log "Stupid shit"
+echo -e "\nDefaults pwfeedback" >> /etc/sudoers
+sed -i '/^#Color/s/^#//' /etc/pacman.conf
+sed -i 's/\(OPTIONS=.*\) debug/\1 !debug/' /etc/makepkg.conf
+
 # chaotic setup
 log "Setting up chaotic repositories"
 pacman-key --recv-key 3056513887B78AEB --keyserver keyserver.ubuntu.com &&
@@ -21,27 +27,37 @@ chaotic_config="\n[chaotic-aur]\nInclude = /etc/pacman.d/chaotic-mirrorlist\n"
 echo -e "$chaotic_config" >> /etc/pacman.conf
 
 # Update packages
-log "Updating packages"
+log "Updating repositories and packages"
 pacman -Syu --noconfirm
 
-# XDG
-log "Installing XDG related packages"
-pacman -S --noconfirm bash-completion git meson xdg-user-dirs
+# Completing installation (?)
+log "Completing Arch install"
+pacman -S --no-confirm plymouth xdg-user-dirs
+
+# Configure plymouth, setting default theme automatically regenerates the image
+log "Adding plymouth and setting plymouth theme"
+HOOKS_LINE=$(grep "^HOOKS=" /etc/mkinitcpio.conf); if ! echo "$HOOKS_LINE" | grep -q "plymouth"; then sudo sed -i '/^HOOKS=/ s/udev/& plymouth/' /etc/mkinitcpio.conf; fi
+plymouth-set-default-theme -R spinfinity
+
+# Devel Things
+log "Installing building packages"
+pacman -S --noconfirm bash-completion git meson
 
 # Hinokitsune
-log "Installing Hinokitsune packages"
-pacman -S --noconfirm noto-fonts noto-fonts-emoji firefox
+log "Installing Hinokitsune and fonts packages"
+pacman -S --noconfirm noto-fonts noto-fonts-emoji noto-fonts-cjk firefox
 
 # Image thingy
 log "Installing Image related packages"
 pacman -S --noconfirm imagemagick webp-pixbuf-loader
 
-# Printers setup
+# HP Printers Setup
 log "Setting up printers"
 pacman -S --noconfirm --needed sane python-pillow cups hplip system-config-printer
 systemctl enable cups.service
+echo "After reboot, run hp-setup -i"
 
-# Plugins for XFCE
+# Plugins for XFCE, thanks to chaotic-aur
 log "Installing XFCE plugins"
 pacman -S --noconfirm xfce4-panel-profiles xfce4-docklike-plugin
 
@@ -57,9 +73,3 @@ for user_home in /home/*; do
         echo -e "\n\npfetch" >> "$user_home/.bashrc"
     fi
 done
-
-# Make it less stupid
-log "Configuring sudoers"
-echo -e "\nDefaults pwfeedback" >> /etc/sudoers
-
-echo "You still must run hp-setup -i"
