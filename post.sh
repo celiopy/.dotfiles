@@ -32,11 +32,12 @@ pacman -Syu --noconfirm
 
 # Completing installation (?)
 log "Completing Arch install"
-pacman -S --no-confirm plymouth xdg-user-dirs
+pacman -S --noconfirm plymouth xdg-user-dirs
 
 # Configure plymouth, setting default theme automatically regenerates the image
 log "Adding plymouth and setting plymouth theme"
 HOOKS_LINE=$(grep "^HOOKS=" /etc/mkinitcpio.conf); if ! echo "$HOOKS_LINE" | grep -q "plymouth"; then sudo sed -i '/^HOOKS=/ s/udev/& plymouth/' /etc/mkinitcpio.conf; fi
+sed -i '/^options / s/rw/rw quiet splash/' /boot/loader/entries/*linux-zen.conf
 plymouth-set-default-theme -R spinfinity
 
 # Devel Things
