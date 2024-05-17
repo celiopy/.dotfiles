@@ -6,6 +6,8 @@ log_file="/var/log/post_install.log"
 # Logging function
 log() {
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$log_file"
+    echo ""
+    echo $1
 }
 
 # Make it less stupid
@@ -41,7 +43,7 @@ sed -i '/^options / s/rw/rw quiet splash/' /boot/loader/entries/*linux-zen.conf
 plymouth-set-default-theme -R spinfinity
 
 # Devel Things
-log "Installing building packages"
+log "Installing building stuff"
 pacman -S --noconfirm bash-completion git meson
 
 # Hinokitsune
@@ -56,7 +58,7 @@ pacman -S --noconfirm imagemagick webp-pixbuf-loader
 log "Setting up printers"
 pacman -S --noconfirm --needed sane python-pillow cups hplip system-config-printer
 systemctl enable cups.service
-echo "After reboot, run hp-setup -i"
+log "NOTE: After reboot run hp-setup -i"
 
 # Plugins for XFCE, thanks to chaotic-aur
 log "Installing XFCE plugins"
