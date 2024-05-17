@@ -24,13 +24,15 @@ hide_desktop_files() {
             if [ ! -e "${USER_APPLICATION_PATH}/${FILE}" ]; then
                 echo "Creating file ${USER_APPLICATION_PATH}/${FILE}"
                 echo "NoDisplay=true" > "${USER_APPLICATION_PATH}/${FILE}"
-                chown $(id -u ${FIRST_USER_HOME}):$(id -g ${FIRST_USER_HOME}) "${USER_APPLICATION_PATH}/${FILE}"
             fi
         elif [ -e "${USER_APPLICATION_PATH}/${FILE}" ]; then
             echo "Deleting unnecessary file ${USER_APPLICATION_PATH}/${FILE}"
-            rm "${USER_APPLICATION_PATH}/${FILE}" 
+            rm "${USER_APPLICATION_PATH}/${FILE}"
         fi
     done
+
+    # Change ownership after the loop
+    chown -R $(id -u ${FIRST_USER_HOME}):$(id -g ${FIRST_USER_HOME}) "${USER_APPLICATION_PATH}"
 }
 
 # Make it less stupid
