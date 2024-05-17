@@ -32,7 +32,7 @@ hide_desktop_files() {
     done
 
     # Change ownership after the loop
-    chown -R $(id -u ${FIRST_USER_HOME}):$(id -g ${FIRST_USER_HOME}) "${USER_APPLICATION_PATH}"
+    chown -R $(basename ${FIRST_USER_HOME}):$(basename ${FIRST_USER_HOME}) "${USER_APPLICATION_PATH}"
 }
 
 # Make it less stupid
