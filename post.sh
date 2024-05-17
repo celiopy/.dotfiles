@@ -16,11 +16,17 @@ hide_desktop_files() {
     local USER_APPLICATION_PATH="${FIRST_USER_HOME}/.local/share/applications"
     local files=("$@")
 
+    # Ensure USER_APPLICATION_PATH exists
+    mkdir -p "${USER_APPLICATION_PATH}"
+
     for FILE in "${files[@]}"; do
         if [ -e "${APPLICATION_PATH}/${FILE}" ]; then
-            echo "Creating file ${USER_APPLICATION_PATH}/${FILE}"
-            echo "NoDisplay=true" > "${USER_APPLICATION_PATH}/${FILE}"
-        elif [ ! -e "${APPLICATION_PATH}/${FILE}" ] && [ -e "${USER_APPLICATION_PATH}/${FILE}" ]; then
+            if [ ! -e "${USER_APPLICATION_PATH}/${FILE}" ]; then
+                echo "Creating file ${USER_APPLICATION_PATH}/${FILE}"
+                echo "NoDisplay=true" > "${USER_APPLICATION_PATH}/${FILE}"
+                chown $(id -u ${FIRST_USER_HOME}):$(id -g ${FIRST_USER_HOME}) "${USER_APPLICATION_PATH}/${FILE}"
+            fi
+        elif [ -e "${USER_APPLICATION_PATH}/${FILE}" ]; then
             echo "Deleting unnecessary file ${USER_APPLICATION_PATH}/${FILE}"
             rm "${USER_APPLICATION_PATH}/${FILE}" 
         fi
