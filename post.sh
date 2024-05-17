@@ -60,8 +60,11 @@ pacman -S --noconfirm imagemagick webp-pixbuf-loader
 
 # HP Printers Setup
 log "Setting up printers"
-pacman -S --noconfirm --needed sane python-pillow cups hplip system-config-printer
+pacman -S --noconfirm --needed cups system-config-printer
 systemctl enable cups.service
+
+log "Installing hplip and deps"
+sudo pacman -S --noconfirm sane python-pillow python-pyqt5 hplip
 log "NOTE: After reboot run hp-setup -i"
 
 # Plugins for XFCE, thanks to chaotic-aur
