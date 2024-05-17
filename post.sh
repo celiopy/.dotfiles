@@ -50,6 +50,10 @@ pacman -S --noconfirm bash-completion git meson
 log "Installing Hinokitsune and fonts packages"
 pacman -S --noconfirm noto-fonts noto-fonts-emoji noto-fonts-cjk firefox
 
+# Other apps?
+log "Installs some other apps"
+pacman -S --noconfirm chromium discord
+
 # Image thingy
 log "Installing Image related packages"
 pacman -S --noconfirm imagemagick webp-pixbuf-loader
