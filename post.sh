@@ -10,11 +10,41 @@ log() {
     echo $1
 }
 
+hide_desktop_files() {
+    local APPLICATION_PATH="/usr/share/applications"
+    local FIRST_USER_HOME=$(ls -d /home/* | head -n 1)
+    local USER_APPLICATION_PATH="${FIRST_USER_HOME}/.local/share/applications"
+    local files=("$@")
+
+    for FILE in "${files[@]}"; do
+        if [ -e "${APPLICATION_PATH}/${FILE}" ]; then
+            echo "Creating file ${USER_APPLICATION_PATH}/${FILE}"
+            echo "NoDisplay=true" > "${USER_APPLICATION_PATH}/${FILE}"
+        elif [ ! -e "${APPLICATION_PATH}/${FILE}" ] && [ -e "${USER_APPLICATION_PATH}/${FILE}" ]; then
+            echo "Deleting unnecessary file ${USER_APPLICATION_PATH}/${FILE}"
+            rm "${USER_APPLICATION_PATH}/${FILE}" 
+        fi
+    done
+}
+
 # Make it less stupid
 log "Stupid shit"
 echo -e "\nDefaults pwfeedback" >> /etc/sudoers
 sed -i '/^#Color/s/^#//' /etc/pacman.conf
 sed -i 's/\(OPTIONS=.*\) debug/\1 !debug/' /etc/makepkg.conf
+
+# List of files to process
+files=(
+    "avahi-discover.desktop" \
+    "bssh.desktop" \
+    "bvnc.desktop" \
+    "qv4l2.desktop" \
+    "qvidcap.desktop"
+)
+
+# Call the function with the list of files
+log "Hide those pesky little shits"
+hide_desktop_files "${files[@]}"
 
 # chaotic setup
 log "Setting up chaotic repositories"
@@ -76,10 +106,5 @@ log "Installing pfetch-rs"
 wget -qO- https://github.com/Gobidev/pfetch-rs/releases/download/v2.9.1/pfetch-linux-gnu-x86_64.tar.gz | tar -xzf - && install -Dm755 pfetch /usr/bin/pfetch && rm -f pfetch
 
 # Append line to all user's .bashrc
-log "Appending pfetch to all users' .bashrc"
-for user_home in /home/*; do
-    if [ -d "$user_home" ]; then
-        echo "Appending to $user_home/.bashrc"
-        echo -e "\n\npfetch" >> "$user_home/.bashrc"
-    fi
-done
+log "Appending pfetch to user's .bashrc"
+echo -e "\n\npfetch" >> $(ls -d /home/* | head -n 1)/.bashrc
