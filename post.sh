@@ -68,8 +68,10 @@ sudo pacman -S --noconfirm sane python-pillow python-pyqt5 hplip
 log "NOTE: After reboot run hp-setup -i"
 
 # Plugins for XFCE, thanks to chaotic-aur
-log "Installing XFCE plugins"
-pacman -S --noconfirm xfce4-panel-profiles xfce4-docklike-plugin
+if pacman -Qi "xfce4-panel" >/dev/null ; then
+    log "Installing XFCE plugins"
+    pacman -S --noconfirm xfce4-panel-profiles xfce4-docklike-plugin
+fi
 
 # pfetch-rs | rust fork of pfetch
 log "Installing pfetch-rs"
