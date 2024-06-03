@@ -42,7 +42,6 @@ install_packages() {
         "xdg-user-dirs"
         "bash-completion"
         "git"
-        "meson"
         "noto-fonts"
         "noto-fonts-emoji"
         "noto-fonts-cjk"
