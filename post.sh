@@ -44,7 +44,7 @@ configure_plymouth() {
         sed -i '/^HOOKS=/ s/udev/& plymouth/' /etc/mkinitcpio.conf
     fi
 
-    plymouth-set-default-theme -R spinfinity
+    plymouth-set-default-theme -R spinner
 
     if pacman -Qi "grub" >/dev/null ; then
         sudo sed -i.bak 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
