@@ -34,11 +34,30 @@ update_packages() {
     pacman -Syu --noconfirm
 }
 
+# Configure Plymouth
+configure_plymouth() {
+    log "Configuring Plymouth"
+
+    pacman -S --noconfirm plymouth
+
+    if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
+        sed -i '/^HOOKS=/ s/udev/& plymouth/' /etc/mkinitcpio.conf
+    fi
+
+    plymouth-set-default-theme -R spinfinity
+
+    if pacman -Qi "grub" >/dev/null ; then
+        sudo sed -i.bak 's/^GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="quiet splash"/' /etc/default/grub
+        grub-mkconfig -o /boot/grub/grub.cfg
+    else
+        sed -i '/^options / s/rw/rw quiet splash/' /boot/loader/entries/*linu*.conf
+    fi
+}
+
 # Install necessary packages
 install_packages() {
     local packages=(
         "archlinux-wallpaper"
-        "plymouth"
         "xdg-user-dirs"
         "bash-completion"
         "git"
@@ -73,16 +92,6 @@ install_packages() {
     fi
 }
 
-# Configure Plymouth
-configure_plymouth() {
-    log "Configuring Plymouth"
-    if ! grep -q "plymouth" /etc/mkinitcpio.conf; then
-        sed -i '/^HOOKS=/ s/udev/& plymouth/' /etc/mkinitcpio.conf
-    fi
-    sed -i '/^options / s/rw/rw quiet splash/' /boot/loader/entries/*linux-zen.conf
-    plymouth-set-default-theme -R spinfinity
-}
-
 # Install pfetch-rs
 install_pfetch_rs() {
     log "Installing pfetch-rs"
@@ -101,8 +110,8 @@ append_to_bashrc() {
 main() {
     setup_chaotic_aur
     update_packages
-    install_packages
     configure_plymouth
+    install_packages
     install_pfetch_rs
     append_to_bashrc
     log "Post-installation script completed successfully"
