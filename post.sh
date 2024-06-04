@@ -87,8 +87,9 @@ install_packages() {
 
     # Install XFCE plugins if XFCE is installed
     if pacman -Qi "xfce4-panel" >/dev/null ; then
-        log "Installing XFCE plugins"
-        pacman -S --noconfirm xfce4-panel-profiles xfce4-docklike-plugin
+        log "Installing XFCE plugins and locker"
+        pacman -Rsnc --noconfirm xfce4-screensaver
+        pacman -S --noconfirm light-locker xfce4-panel-profiles xfce4-docklike-plugin
     fi
 }
 
