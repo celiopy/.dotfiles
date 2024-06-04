@@ -60,11 +60,11 @@ install_packages() {
         "archlinux-wallpaper"
         "xdg-user-dirs"
         "bash-completion"
+        "lightdm-gtk-greeter-settings"
         "git"
         "noto-fonts"
         "noto-fonts-emoji"
         "noto-fonts-cjk"
-        "emacs"
         "libreoffice-fresh"
         "firefox"
         "chromium"
@@ -85,11 +85,11 @@ install_packages() {
     pacman -S --noconfirm "${packages[@]}"
     systemctl enable cups.service
 
-    # Install XFCE plugins if XFCE is installed
+    # Install XFCE extensions if XFCE is installed
     if pacman -Qi "xfce4-panel" >/dev/null ; then
-        log "Installing XFCE plugins and locker"
+        log "Installing XFCE exts and locker"
         pacman -Rsnc --noconfirm xfce4-screensaver
-        pacman -S --noconfirm light-locker xfce4-panel-profiles xfce4-docklike-plugin
+        pacman -S --noconfirm light-locker xfce4-panel-profiles mugshot
     fi
 }
 
