@@ -7,14 +7,7 @@ readonly LOG_FILE="/var/log/post_install.log"
 log() {
     local message="$1"
     echo "$(date '+%Y-%m-%d %H:%M:%S') - $message" >> "$LOG_FILE"
-    echo "$message"
-}
-
-# Error logging function
-log_error() {
-    local message="$1"
-    echo "$(date '+%Y-%m-%d %H:%M:%S') - ERROR: $message" >> "$LOG_FILE"
-    echo "ERROR: $message"
+    echo "$message" ; sleep 1
 }
 
 # Add repository keys and setup Chaotic AUR
@@ -56,40 +49,112 @@ configure_plymouth() {
 
 # Install necessary packages
 install_packages() {
-    local packages=(
-        "archlinux-wallpaper"
-        "xdg-user-dirs"
-        "bash-completion"
-        "lightdm-gtk-greeter-settings"
+    # Define arrays for different categories
+    base_system=(
+        "base-devel"
         "git"
+        "xdg-user-dirs"
+    )
+
+    desktop_environment=(
+        "archlinux-wallpaper"
+        "lightdm-gtk-greeter-settings"
+    )
+
+    web_browsers=(
+        "firefox"
+        "chromium"
+    )
+
+    productivity=(
+        "libreoffice-fresh"
+    )
+
+    fonts=(
         "noto-fonts"
         "noto-fonts-emoji"
         "noto-fonts-cjk"
-        "libreoffice-fresh"
-        "firefox"
-        "chromium"
-        "discord"
-        "imagemagick"
-        "webp-pixbuf-loader"
+    )
+
+    audio=(
+        "audacity"
+    )
+
+    video=(
         "vlc"
         "stremio"
+        "obs-studio"
+    )
+
+    multimedia_libraries=(
+        "ffmpeg"
+        "gstreamer"
+        "gst-plugins-good"
+        "gst-plugins-bad"
+        "gst-plugins-ugly"
+        "imagemagick"
+        "lmms"
+        "libdvdcss"
+        "libmad"
+        "libdvdread"
+        "libdvdnav"
+        "libbluray"
+        "libaacs"
+        "webp-pixbuf-loader"
+    )
+
+    communication=(
+        "discord"
+    )
+
+    printing=(
         "cups"
         "system-config-printer"
-        "sane"
-        "python-pillow"
-        "python-pyqt5"
         "hplip"
     )
 
-    log "Installing necessary packages"
-    pacman -S --noconfirm "${packages[@]}"
+    development=(
+        "bash-completion"
+        "python-pillow"
+        "python-pyqt5"
+    )
+
+    graphics=(
+        "gimp"
+        "inkscape"
+    )
+
+    # Array containing all category arrays
+    categories=(
+        base_system
+        desktop_environment
+        web_browsers
+        productivity
+        fonts
+        audio
+        video
+        multimedia_libraries
+        communication
+        printing
+        development
+        graphics
+    )
+
+    # Loop through categories and install packages
+    for category in "${categories[@]}" ; do
+        log "Installing packages for $category..."
+        sudo pacman -S --noconfirm "${!category[@]}"
+        echo "Done."
+        echo
+    done
+
     systemctl enable cups.service
 
     # Install XFCE extensions if XFCE is installed
     if pacman -Qi "xfce4-panel" >/dev/null ; then
         log "Installing XFCE exts and locker"
         pacman -Rsnc --noconfirm xfce4-screensaver
-        pacman -S --noconfirm light-locker xfce4-panel-profiles mugshot
+        pacman -S --noconfirm light-locker mugshot
     fi
 }
 
@@ -102,9 +167,31 @@ install_pfetch_rs() {
 # Append line to all user's .bashrc
 append_to_bashrc() {
     log "Appending pfetch to user's .bashrc"
-    for user_home in /home/*; do
+    for user_home in /home/* ; do
         echo -e "\n\npfetch" >> "$user_home/.bashrc"
     done
+}
+
+cleanup() {
+    log "Cleaning up..."
+    sudo pacman -Rns --noconfirm $(pacman -Qtdq)  # Remove all orphaned packages and their configuration files
+    sudo pacman -Scc --noconfirm  # Clean package cache
+}
+
+
+# Prompt user to reboot
+prompt_reboot() {
+    echo
+    read -rp "Do you want to reboot now? [Y/n] " choice
+    case "$choice" in
+        [yY]|[yY][eE][sS]|"")
+            log "Rebooting system"
+            systemctl reboot
+            ;;
+        *)
+            log "Post-installation tasks completed. You can manually reboot later."
+            ;;
+    esac
 }
 
 # Main function
@@ -115,7 +202,9 @@ main() {
     install_packages
     install_pfetch_rs
     append_to_bashrc
-    log "Post-installation script completed successfully"
+
+    cleanup
+    prompt_reboot
 }
 
 main
