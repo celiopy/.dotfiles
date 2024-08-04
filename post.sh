@@ -47,46 +47,60 @@ configure_plymouth() {
     fi
 }
 
-# Install necessary packages
+#!/bin/bash
+
+# Function to install packages from an array
+install_packages_from_array() {
+    local category="$1"
+    shift
+    local packages=("$@")
+
+    echo "Installing packages for $category..."
+    sudo pacman -S --noconfirm "${packages[@]}"
+    echo "Done."
+    echo
+}
+
+# Main function
 install_packages() {
     # Define arrays for different categories
-    base_system=(
+    local base_system=(
         "base-devel"
         "git"
         "xdg-user-dirs"
     )
 
-    desktop_environment=(
+    local desktop_environment=(
         "archlinux-wallpaper"
         "lightdm-gtk-greeter-settings"
     )
 
-    web_browsers=(
+    local web_browsers=(
         "firefox"
         "chromium"
     )
 
-    productivity=(
+    local productivity=(
         "libreoffice-fresh"
     )
 
-    fonts=(
+    local fonts=(
         "noto-fonts"
         "noto-fonts-emoji"
         "noto-fonts-cjk"
     )
 
-    audio=(
+    local audio=(
         "audacity"
     )
 
-    video=(
+    local video=(
         "vlc"
         "stremio"
         "obs-studio"
     )
 
-    multimedia_libraries=(
+    local multimedia_libraries=(
         "ffmpeg"
         "gstreamer"
         "gst-plugins-good"
@@ -103,58 +117,58 @@ install_packages() {
         "webp-pixbuf-loader"
     )
 
-    communication=(
+    local communication=(
         "discord"
     )
 
-    printing=(
+    local printing=(
         "cups"
         "system-config-printer"
         "hplip"
     )
 
-    development=(
+    local development=(
         "bash-completion"
         "python-pillow"
         "python-pyqt5"
     )
 
-    graphics=(
+    local graphics=(
         "gimp"
         "inkscape"
     )
 
     # Array containing all category arrays
-    categories=(
-        base_system
-        desktop_environment
-        web_browsers
-        productivity
-        fonts
-        audio
-        video
-        multimedia_libraries
-        communication
-        printing
-        development
-        graphics
+    local categories=(
+        "base_system"
+        "desktop_environment"
+        "web_browsers"
+        "productivity"
+        "fonts"
+        "audio"
+        "video"
+        "multimedia_libraries"
+        "communication"
+        "printing"
+        "development"
+        "graphics"
     )
 
     # Loop through categories and install packages
     for category in "${categories[@]}" ; do
-        log "Installing packages for $category..."
-        sudo pacman -S --noconfirm "${!category[@]}"
-        echo "Done."
-        echo
+        local packages
+        eval "packages=(\"\${${category}[@]}\")"
+        install_packages_from_array "$category" "${packages[@]}"
     done
 
+    # Enable CUPS service
     systemctl enable cups.service
 
     # Install XFCE extensions if XFCE is installed
-    if pacman -Qi "xfce4-panel" >/dev/null ; then
-        log "Installing XFCE exts and locker"
-        pacman -Rsnc --noconfirm xfce4-screensaver
-        pacman -S --noconfirm light-locker mugshot
+    if pacman -Qi xfce4-panel >/dev/null 2>&1 ; then
+        echo "Installing XFCE exts and locker"
+        sudo pacman -Rsnc --noconfirm xfce4-screensaver
+        sudo pacman -S --noconfirm light-locker mugshot
     fi
 }
 
