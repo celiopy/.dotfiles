@@ -21,6 +21,33 @@ confirm() {
     esac
 }
 
+# Function to install office suite
+install_office_suite() {
+    log "Installing office suite"
+    read -p "Would you like to install Calligra or LibreOffice? (c/l): " choice
+
+    case "$choice" in
+        c|C)
+            install_package "calligra"
+            ;;
+        l|L)
+            install_package "libreoffice-fresh"  # or "libreoffice-still"
+            ;;
+        *)
+            log "Invalid option. Please choose 'c' for Calligra or 'l' for LibreOffice." 1
+            ;;
+    esac
+}
+
+# Function to install a package using pacman
+install_package() {
+    local package=$1
+    log "Installing $package..."
+    if ! sudo pacman -S --noconfirm "$package"; then
+        log "Failed to install $package." 1
+    fi
+}
+
 # Add repository keys and setup Chaotic AUR
 setup_chaotic_aur() {
     log "Setting up Chaotic AUR repositories"
@@ -108,16 +135,11 @@ install_packages() {
 
     local desktop_environment=(
         "archlinux-wallpaper"
-        "lightdm-gtk-greeter-settings"
     )
 
     local web_browsers=(
         "firefox"
         "chromium"
-    )
-
-    local productivity=(
-        "libreoffice-fresh"
     )
 
     local fonts=(
@@ -170,7 +192,6 @@ install_packages() {
         "base_system"
         "desktop_environment"
         "web_browsers"
-        "productivity"
         "fonts"
         "video"
         "libs"
@@ -187,11 +208,9 @@ install_packages() {
         install_packages_from_array "$category" "${packages[@]}"
     done
 
-    # Enable CUPS service
-    if confirm "This will enable the CUPS service. Proceed?"; then
+    # Enable CUPS service if CUPS installed
+    if pacman -Qi cups >/dev/null 2>&1; then
         systemctl enable cups.service
-    else
-        log "CUPS service enabling canceled."
     fi
 
     # Install XFCE extensions if XFCE is installed
@@ -273,6 +292,7 @@ main() {
     update_packages
     configure_plymouth
     install_packages
+    install_office_suite  # Call the office suite installation function
     install_pfetch_rs
     append_to_bashrc
 
